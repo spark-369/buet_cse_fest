@@ -1,311 +1,83 @@
-# BUET CSE FEST Hackathon 2026  
-## AI / API Preliminary Round – Starter Repository
+# BCF 2026 Hackathon - Natural Language Database Query API
 
-Welcome to the official starter repository for the  
-**AI / API Preliminary Round** of BUET CSE FEST Hackathon 2026.
+This project provides a backend API that allows users to query a PostgreSQL database using natural language questions. The system uses Google's Gemini AI to generate SQL queries from user questions, executes them on the database, and returns structured results.
 
-This repository contains:
+## Features
 
-- The complete problem statement
-- Database setup files
-- External API specifications
-- Testing tools
-- Submission templates
+- Natural language to SQL conversion using Google Gemini AI
+- PostgreSQL database integration
+- RESTful API endpoints
+- Health check endpoint
+- Support for different result types (scalar, record, table)
 
-You are expected to **fork this repository and build your solution inside it**.
+## Prerequisites
 
----
+- Node.js (version 18 or higher)
+- Docker and Docker Compose
+- Google Gemini API key
 
-## Quick Start
+## Setup
 
-Follow these steps **in order**.
+1. **Clone the repository and navigate to the backend directory:**
+   ```bash
+   cd backend
+   ```
 
-### Step 1: Fork This Repository
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-Click **Fork** on GitHub and create your own copy.
+3. **Set up environment variables:**
+   Copy `.env.example` to `.env` and fill in the required values:
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` with your database credentials and Gemini API key.
 
-Then clone it:
+4. **Start the database:**
+   ```bash
+   docker-compose up -d postgres
+   ```
+   This will start PostgreSQL on port 5433 with the required database and data.
 
-```bash
-git clone <your-fork-url>
-cd <repo-name>
-```
+5. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+   The server will start on port 8080.
 
----
+## API Endpoints
 
-### Step 2: Read the Problem Statement
+### Health Check
+- **GET** `/api/health`
+- Checks database connectivity
+- Response: `{ "status": "ok", "database": "connected" }`
 
-Go to:
+### Query Database
+- **POST** `/api/query`
+- Body: `{ "question": "string", "llm": "optional model name" }`
+- Generates SQL from natural language question and executes it
+- Response format varies based on result type
 
-[problem-statement/problem-statement.md](./problem-statement/problem-statement.md)
-
-
-This file explains everything.
-
-Start here.
-
----
-
-### Step 3: Choose Your Backend Technology
-
-You may use **any backend framework or language**.
-
-Examples:
-
-* Python (Flask / FastAPI / Django)
-* Node.js (Express / NestJS)
-* TypeScript
-* Any other server framework
-
-All your backend code must go inside:
-
-```
-backend/
-```
-
----
-
-### Step 4: Set Up the Database
-
-Choose ONE method:
-
-#### Option A: Using Docker (Recommended)
-
-Follow:
-
-[problem-statement/run-postgres-with-docker.md](./problem-statement/run-postgres-with-docker.md)
-
-
-#### Option B: Local PostgreSQL
-
-Follow:
-
-
-[problem-statement/run-postgres-locally.md](./problem-statement/run-postgres-locally.md)
-
----
-
-### Step 5: Build Your Backend
-
-Inside `backend/`, create your server.
-
-Your server must provide:
-
-* `GET /health`
-* `POST /query`
-
-As described in the problem statement.
-
----
-
-### Step 6: Configure hackathon.yml
-
-Open:
-
-```
-hackathon.yml
-```
-
-Edit it to match your backend.
-
-Templates are available in:
-
-```
-hackathon.yml.templates/
-```
-
-Copy the closest template and modify it.
-
-Example:
+## Usage Example
 
 ```bash
-cp hackathon.yml.templates/hackathon.python.template.yml hackathon.yml
+curl -X POST http://localhost:8080/api/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What are the total sales by category?"}'
 ```
 
----
+## Project Structure
 
-### Step 7: Create .env.example
+- `src/app/api/` - Next.js API routes
+- `lib/` - Utility functions for LLM and schema handling
+- `prisma/` - Database schema and client setup
 
-Inside `backend/`, create `.env` from `.env.example`:
+## Technologies Used
 
-```
-cp .env.example .env
-```
-
-- Now fill up the env vars
-
-```env
-DB_HOST=
-DB_PORT=
-DB_NAME=
-DB_USER=
-DB_PASSWORD=
-GEMINI_API_KEY=
-
-PORT=8080
-```
-
-Do NOT commit `.env` Put it in `.gitingore`.
-
----
-
-### Step 8: Test Your Server
-
-Start your server using your commands.
-
-Check:
-
-```bash
-curl http://localhost:8080/health
-```
-
-You should see:
-
-```json
-{
-  "status": "ok",
-  "database": "connected"
-}
-```
-
----
-
-### Step 9: Run the Checker
-
-Go to:
-
-```bash
-cd checker
-python checker.py -b http://localhost:8080
-```
-
-Fix errors until tests pass.
-
----
-
-## 📁 Repository Structure (Important)
-
-```
-.
-├── backend/              ← Your server code goes here
-│
-├── checker/              ← Testing scripts
-│
-├── data/                 ← Database dump
-│
-├── external-apis/        ← API collections (Bruno)
-│
-├── hackathon.yml         ← Automation config (REQUIRED)
-│
-├── hackathon.yml.templates/ ← Ready-made templates
-│
-├── problem-statement/    ← Full documentation
-│
-└── README.md             ← You are reading this
-```
-
-Do not move or rename these folders.
-
----
-
-## 📚 Important Documents
-
-| Purpose           | File                                       |
-| ----------------- | ------------------------------------------ |
-| Main instructions | [problem-statement/problem-statement.md](./problem-statement/problem-statement.md)     |
-| Database setup    | problem-statement/run-postgres-*.md        |
-| Schema            | [problem-statement/schema-description.md](./problem-statement/schema-description.md)    |
-| Submission        | [problem-statement/submission_guideline.md](./problem-statement/submission_guideline.md)  |
-| External APIs     | [problem-statement/opeapi-specification.yml](./problem-statement/opeapi-specification.yml) |
-
----
-
-## 🌐 External APIs
-
-External API definitions are provided in:
-
-```
-external-apis/
-```
-
-and
-
-```
-problem-statement/opeapi-specification.yml
-```
-
-Use these for tool selection.
-
-Do NOT use other APIs.
-
----
-
-## 🧪 Automated Evaluation
-
-Your project will be evaluated automatically.
-
-The judge will:
-
-1. Clone your repository
-2. Read `hackathon.yml`
-3. Generate `.env`
-4. Install dependencies
-5. Start your server
-6. Call `/health`
-7. Run checker
-
-If any step fails, your submission may fail.
-
----
-
-## 📤 Submission
-
-Read:
-
-```
-problem-statement/submission_guideline.md
-```
-
-Then submit your GitHub repository link via the Google Form.
-
----
-
-## ⚠️ Common Mistakes
-
-❌ Writing code outside `backend/`
-❌ Missing `hackathon.yml`
-❌ Committing `.env`
-❌ Wrong server port
-❌ Missing `/health` endpoint
-❌ Hardcoding answers
-
-Avoid these.
-
----
-
-## 💡 Tips for Beginners
-
-* Start simple
-* First make `/health` work
-* Then connect DB
-* Then answer 1–2 queries
-* Then add LLM
-* Then add external APIs
-
-Do not try to do everything at once.
-
----
-
-## 🤝 Support
-
-If you are confused:
-
-1. Re-read the problem statement
-2. Check example templates
-3. Just use chatGPT
-
----
-
-Good luck, and happy hacking!
-
----
+- Next.js
+- Prisma
+- Google Generative AI (Gemini)
+- PostgreSQL
+- Tailwind CSS (for potential frontend)
